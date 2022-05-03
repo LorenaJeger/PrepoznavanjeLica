@@ -53,13 +53,18 @@ def prepare_training_data(data_folder_path):
     faces = []  #lista u kojoj se spremaju sva lica
     labels = []   #lista u kojoj se spremaju sve labele
     nazivi=[]
+    nazivi_novi=[]
+    i=0
     for dir_name in dirs:    #idi kroz svaki direktorij to jest svaku mapu i procitaj slike u njemu, za svaki dir_name(naziv mape u treningu) u dirs(trening mapa)
         
         # Probaj dobiti nazive imena foldera 
         if dir_name.startswith("."): continue
+        i+=1
         name = dir_name
         nazivi.append(name)
-        label = int(dir_name.replace("s", ""))
+        i_string= str(i)
+        label = int(dir_name.replace(name, i_string))
+        nazivi_novi.append(label)
         subject_dir_path = data_folder_path + "/" + dir_name    #definiranje trenutnog direktorija za trenutni subjekt subject_dir_path    #primjer sample subject_dir_path = "training-data/s1"
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
@@ -79,15 +84,16 @@ def prepare_training_data(data_folder_path):
     cv2.waitKey(1)
     cv2.destroyAllWindows()
     
-    return faces, labels, nazivi
+    return faces, labels, nazivi, nazivi_novi
  
 
 print("Pripremam ppodatke za treniranje...")
 from datetime import datetime
 start_time = datetime.now()
-faces, labels, nazivi = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
+faces, labels, nazivi, nazivi_novi = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
 # nazive izlačimo iz naziva mapa to nam treba za LFW paket 
 print(nazivi)
+print('novi nazivi', nazivi_novi)
 print("Podaci pripremljeni")
 end_time = datetime.now()
 print('Vrijeme pripreme_ podatak tj detekcija i spremanje: {}'.format(end_time - start_time))
