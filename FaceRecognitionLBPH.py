@@ -21,7 +21,7 @@ def detect_face(img):
 
     # koristimo metodu `detectMultiScale` klase `cv2.CascadeClassifier` za otkrivanje svih lica na slici
     # faces sadržava popis svih lica koja su detektirana
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
     
     #Ako lice nije definirano vrati originalnu sliku
     if (len(faces) == 0):
@@ -46,18 +46,26 @@ def detect_face(img):
 def prepare_training_data(data_folder_path):
 
     dirs = os.listdir(data_folder_path)   #Dobija putanju za izlistanje mapa u gore prosljedenom paramtru koje predstavlja svaka svoju osobu
+
+
+
+
     faces = []  #lista u kojoj se spremaju sva lica
     labels = []   #lista u kojoj se spremaju sve labele
-    
-   
+    nazivi=[]
     for dir_name in dirs:    #idi kroz svaki direktorij to jest svaku mapu i procitaj slike u njemu, za svaki dir_name(naziv mape u treningu) u dirs(trening mapa)
+        
+        # Probaj dobiti nazive imena foldera 
+        if dir_name.startswith("."): continue
+        name = dir_name
+        nazivi.append(name)
         label = int(dir_name.replace("s", ""))
         subject_dir_path = data_folder_path + "/" + dir_name    #definiranje trenutnog direktorija za trenutni subjekt subject_dir_path    #primjer sample subject_dir_path = "training-data/s1"
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
         for image_name in subject_images_names:    #za svaki naziv slike procitaj sliku u  subject_images_names
                 if image_name.startswith("."):   #ignoriraj system files like .DS_Store
-                    continue;
+                    continue
                 image_path = subject_dir_path + "/" + image_name   #stvori putanju slike path  #primjer image path = training-data/s1/1.pgm
                 image = cv2.imread(image_path) #čitaj sliku na tom prosljedenom image_pathu
                 cv2.imshow("Training on image...", cv2.resize(image, (400, 500)))  #prikazati prozor slike za prikaz slike
@@ -71,13 +79,15 @@ def prepare_training_data(data_folder_path):
     cv2.waitKey(1)
     cv2.destroyAllWindows()
     
-    return faces, labels
+    return faces, labels, nazivi
  
 
 print("Pripremam ppodatke za treniranje...")
 from datetime import datetime
 start_time = datetime.now()
-faces, labels = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
+faces, labels, nazivi = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
+# nazive izlačimo iz naziva mapa to nam treba za LFW paket 
+print(nazivi)
 print("Podaci pripremljeni")
 end_time = datetime.now()
 print('Vrijeme pripreme_ podatak tj detekcija i spremanje: {}'.format(end_time - start_time))
@@ -85,6 +95,7 @@ print('Vrijeme pripreme_ podatak tj detekcija i spremanje: {}'.format(end_time -
 #Ispisujemo koliko je detektirano lica i koliko je detektirano labela prilikom prpiremanja podataka, funkcija pripremi podatke poziva funkciju detekcija lica 
 print("Duljina faces: ", len(faces))
 print("Duljina labels: ", len(labels))
+print("Duljina name: ", len(nazivi))
 
 
 
