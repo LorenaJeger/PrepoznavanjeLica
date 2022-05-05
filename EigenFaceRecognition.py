@@ -7,6 +7,7 @@ import numpy as np
 #there is no label 0 in our training data so subject name for index/label 0 is empty
 # subjects = ["", "Ramiz Raja", "Elvis Presley"]
 subjects=[]
+width_d, height_d = 400, 500
 
 #funkcija za detekciju lica pomocu OpenCV
 def detect_face(img):
@@ -15,7 +16,7 @@ def detect_face(img):
      
     #učitavanje OpenCV face detector cv2.CascadeClassifier, korišten je  LBP koji je brži
     #Također ima i Haar classifier, ali je sporiji
-    face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
+    face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_alt.xml')
 
    
 
@@ -55,6 +56,7 @@ def prepare_training_data(data_folder_path):
     nazivi=[]
     nazivi_novi=[]
     i=0
+   
     for dir_name in dirs:    #idi kroz svaki direktorij to jest svaku mapu i procitaj slike u njemu, za svaki dir_name(naziv mape u treningu) u dirs(trening mapa)
         
         # Probaj dobiti nazive imena foldera 
@@ -69,18 +71,18 @@ def prepare_training_data(data_folder_path):
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
         for image_name in subject_images_names:    #za svaki naziv slike procitaj sliku u  subject_images_names
-                
                 if image_name.startswith("."):   #ignoriraj system files like .DS_Store
                     continue
-                
                 image_path = subject_dir_path + "/" + image_name   #stvori putanju slike path  #primjer image path = training-data/s1/1.pgm
                 image = cv2.imread(image_path) #čitaj sliku na tom prosljedenom image_pathu
-                cv2.imshow("Training on image...", cv2.resize(image, (400, 500)))  #prikazati prozor slike za prikaz slike
+                # cv2.resize(image, (280, 280))  #prikazati prozor slike za prikaz slike
+                cv2.imshow("Training on image...", cv2.resize(image, (width_d, height_d)))
                 cv2.waitKey(100)
                 face, rect = detect_face(image)   #pozivamo funkciju za detekciju lica gore definiranu i prosljedujemo joj trenutnu sliku
                 if face is not None: #ako lice nije none tj, ako je pronađeno lice
-                    faces.append(face)  #dodaj lice (face) u listu lica(faces)
+                    faces.append(cv2.resize(face, (width_d, height_d)))
                     labels.append(label)  #dodaj label za to lice
+                   
             
     cv2.destroyAllWindows()
     cv2.waitKey(1)
@@ -111,22 +113,12 @@ print("Duljina name: ", len(nazivi))
 
 
 
-# Treniranje Face Recognizer u ovom primjeru ćemo koristiti LBPH face recognizer
-
-# 1. EigenFace Recognizer: This can be created with `cv2.face.createEigenFaceRecognizer()`
-# 2. FisherFace Recognizer: This can be created with `cv2.face.createFisherFaceRecognizer()`
-# 3. Local Binary Patterns Histogram (LBPH): This can be created with `cv2.face.LBPHFisherFaceRecognizer()`
+# Treniranje Face Recognizer u ovom primjeru ćemo koristiti EigenFaceRecognizer
 
 
-
-#Kreiramo LBPH face recognizer 
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 #or use EigenFaceRecognizer by replacing above line with 
-#face_recognizer = cv2.face.EigenFaceRecognizer_create()
-
-#or use FisherFaceRecognizer by replacing above line with 
-#face_recognizer = cv2.face.FisherFaceRecognizer_create()
+face_recognizer = cv2.face.EigenFaceRecognizer_create()
 
 # Treniramo face recognizer na našem trening skupu lica
 
@@ -162,9 +154,11 @@ def predict(test_img):
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
     #predict the image using our face recognizer 
-    
+    face = cv2.resize(face, (width_d, height_d)) # FisherFace traži da su sve slike iste velicina pa bih to navela kao nedostatak
     label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
     label_text = nazivi[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
+
+
     
     draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
     draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
@@ -189,9 +183,9 @@ end_time = datetime.now()
 print('Predvidanje zavrseno{}'.format(end_time - start_time))
 
 #pokazi slike predikcije
-cv2.imshow(nazivi[1], cv2.resize(predicted_img1, (400, 500)))
-cv2.imshow(nazivi[2], cv2.resize(predicted_img2, (400, 500)))
-cv2.imshow(nazivi[3], cv2.resize(predicted_img3, (400, 500)))
+cv2.imshow(nazivi[1], cv2.resize(predicted_img1, (width_d, height_d)))
+cv2.imshow(nazivi[2], cv2.resize(predicted_img2, (width_d, height_d)))
+cv2.imshow(nazivi[3], cv2.resize(predicted_img3, (width_d, height_d)))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
