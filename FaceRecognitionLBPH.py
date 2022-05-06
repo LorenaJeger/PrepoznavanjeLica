@@ -44,27 +44,26 @@ def detect_face(img):
 
 
 def prepare_training_data(data_folder_path):
-
+    i=0
     dirs = os.listdir(data_folder_path)   #Dobija putanju za izlistanje mapa u gore prosljedenom paramtru koje predstavlja svaka svoju osobu
-
-
-
 
     faces = []  #lista u kojoj se spremaju sva lica
     labels = []   #lista u kojoj se spremaju sve labele
-    nazivi=[]
-    nazivi_novi=[]
-    i=0
+    # nazivi=[]
+    # nazivi_novi=[]
+   
     for dir_name in dirs:    #idi kroz svaki direktorij to jest svaku mapu i procitaj slike u njemu, za svaki dir_name(naziv mape u treningu) u dirs(trening mapa)
         
         # Probaj dobiti nazive imena foldera 
         if dir_name.startswith("."): continue
-        i+=1
+        if(i == 0): print("null indeks")
+        # else: i = i+ 1
+        print("i:", i)
         name = dir_name
-        nazivi.append(name)
+        subjects.append(name)
         i_string= str(i)
         label = int(dir_name.replace(name, i_string))
-        nazivi_novi.append(label)
+        # nazivi_novi.append(label)
         subject_dir_path = data_folder_path + "/" + dir_name    #definiranje trenutnog direktorija za trenutni subjekt subject_dir_path    #primjer sample subject_dir_path = "training-data/s1"
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
@@ -81,13 +80,13 @@ def prepare_training_data(data_folder_path):
                 if face is not None: #ako lice nije none tj, ako je pronađeno lice
                     faces.append(face)  #dodaj lice (face) u listu lica(faces)
                     labels.append(label)  #dodaj label za to lice
-            
+        i += 1    
     cv2.destroyAllWindows()
     cv2.waitKey(1)
     cv2.destroyAllWindows()
-    subjects= nazivi.sort(reverse=True)
+    # subjects= nazivi.sort(reverse=True)
     
-    return faces, labels, nazivi, nazivi_novi, subjects
+    return faces, labels, subjects
  
 
 
@@ -95,11 +94,10 @@ print("Pripremam ppodatke za treniranje...")
 
 from datetime import datetime
 start_time = datetime.now()
-faces, labels, nazivi, nazivi_novi, subjects = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
+faces, labels, subjects = prepare_training_data("training-data")  #Pozivanjem funkcije prepare_trening_data s parametrom trening mape dobivamo 2 liste jedna sadrži sva lica druga sve labele za sva lica
 # nazive izlačimo iz naziva mapa to nam treba za LFW paket 
-print(nazivi)
-print('novi nazivi', nazivi_novi)
-print("sortirano polje", subjects)
+
+print("subjects: ", subjects)
 print("Podaci pripremljeni")
 end_time = datetime.now()
 print('Vrijeme pripreme_ podatak tj detekcija i spremanje: {}'.format(end_time - start_time))
@@ -107,7 +105,7 @@ print('Vrijeme pripreme_ podatak tj detekcija i spremanje: {}'.format(end_time -
 #Ispisujemo koliko je detektirano lica i koliko je detektirano labela prilikom prpiremanja podataka, funkcija pripremi podatke poziva funkciju detekcija lica 
 print("Duljina faces: ", len(faces))
 print("Duljina labels: ", len(labels))
-print("Duljina name: ", len(nazivi))
+print("Duljina name: ", len(subjects))
 
 
 
@@ -164,7 +162,7 @@ def predict(test_img):
     #predict the image using our face recognizer 
     
     label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
-    label_text = nazivi[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
+    label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
     
     draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
     draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
@@ -177,21 +175,19 @@ print("Predikcija slika u tijeku...")
 #load test images
 test_img1 = cv2.imread("test-data/test1.jpg")
 test_img2 = cv2.imread("test-data/test2.jpg")
-test_img3 = cv2.imread("test-data/Yasar_Yakis_0001.jpg")
+
 
 # izvrsi predvidanje
 from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 predicted_img1 = predict(test_img1)
 predicted_img2 = predict(test_img2)
-predicted_img3 = predict(test_img3)
 end_time = datetime.now()
 print('Predvidanje zavrseno{}'.format(end_time - start_time))
 
 #pokazi slike predikcije
-cv2.imshow(nazivi[1], cv2.resize(predicted_img1, (400, 500)))
-cv2.imshow(nazivi[2], cv2.resize(predicted_img2, (400, 500)))
-cv2.imshow(nazivi[3], cv2.resize(predicted_img3, (400, 500)))
+cv2.imshow(subjects[1], cv2.resize(predicted_img1, (400, 500)))
+cv2.imshow(subjects[2], cv2.resize(predicted_img2, (400, 500)))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
