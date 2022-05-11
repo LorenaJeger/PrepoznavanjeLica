@@ -132,6 +132,7 @@ def draw_text(img, text, x, y):
 def predict(test_img):
 
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
+    print("kopirana slika dimenzija", img.shape)
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
     #predict the image using our face recognizer 
@@ -144,7 +145,6 @@ def predict(test_img):
     return img
 
 
-
 #Pozivanje funkcije predvidanja na testnom skupu.
 
 print("Predikcija slika u tijeku...")
@@ -152,7 +152,7 @@ print("Predikcija slika u tijeku...")
 #load test images
 test_img1 = cv2.imread("test-data/test1.jpg") 
 test_img2 = cv2.imread("test-data/test2.jpg")
-# test_img3 = cv2.imread("test-data/test3.jpg")
+test_img3 = cv2.imread("test-data/test3.jpg")
 # test_img4 = cv2.imread("test-data/test4.jpeg")
 # test_img5 = cv2.imread("test-data/test5.jpeg")
 # test_img6 = cv2.imread("test-data/test6.jpeg")
@@ -167,7 +167,7 @@ from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 predicted_img1 = predict(test_img1)
 predicted_img2 = predict(test_img2)
-# predicted_img3 = predict(test_img3)
+predicted_img3 = predict(test_img3)
 # predicted_img4 = predict(test_img4)
 # predicted_img5 = predict(test_img5)
 # predicted_img6 = predict(test_img6)
@@ -181,7 +181,7 @@ print('Predvidanje zavrseno{}'.format(end_time - start_time))
 #pokazi slike predikcije
 cv2.imshow("Predvidanje na tesnom skupu", cv2.resize(predicted_img1, (400, 500)))
 cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img2, (400, 500)))
-# cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img3, (400, 500)))
+cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img3, (400, 500)))
 
 
 cv2.waitKey(0)
