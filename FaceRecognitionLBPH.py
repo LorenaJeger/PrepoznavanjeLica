@@ -179,8 +179,10 @@ end_time = datetime.now()
 print('Predvidanje zavrseno{}'.format(end_time - start_time))
 
 #pokazi slike predikcije
-cv2.imshow(subjects[2], cv2.resize(predicted_img1, (400, 500)))
-cv2.imshow(subjects[1], cv2.resize(predicted_img2, (400, 500)))
+cv2.imshow("Predvidanje na tesnom skupu", cv2.resize(predicted_img1, (400, 500)))
+cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img2, (400, 500)))
+# cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img3, (400, 500)))
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()

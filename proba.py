@@ -176,7 +176,7 @@ for slika in dirs:
     print(dimenzija,name)
     
     predict_img=predict(img)
-    cv2.imshow(subjects[1], cv2.resize(predict_img, (400, 500)))
+    cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
