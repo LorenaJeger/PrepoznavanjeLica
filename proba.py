@@ -5,8 +5,6 @@ import numpy as np
 from PIL import Image
 
 
-#there is no label 0 in our training data so subject name for index/label 0 is empty
-# subjects = ["", "Ramiz Raja", "Elvis Presley"]
 subjects=[]
 
 #funkcija za detekciju lica pomocu OpenCV
@@ -89,8 +87,6 @@ def prepare_training_data(data_folder_path):
     
     return faces, labels, subjects
  
-
-
 print("Pripremam ppodatke za treniranje...")
 
 from datetime import datetime
@@ -109,25 +105,9 @@ print("Duljina labels: ", len(labels))
 print("Duljina name: ", len(subjects))
 
 
-
-# Treniranje Face Recognizer u ovom primjeru ćemo koristiti LBPH face recognizer
-
-# 1. EigenFace Recognizer: This can be created with `cv2.face.createEigenFaceRecognizer()`
-# 2. FisherFace Recognizer: This can be created with `cv2.face.createFisherFaceRecognizer()`
-# 3. Local Binary Patterns Histogram (LBPH): This can be created with `cv2.face.LBPHFisherFaceRecognizer()`
-
-
-
 #Kreiramo LBPH face recognizer 
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-#or use EigenFaceRecognizer by replacing above line with 
-#face_recognizer = cv2.face.EigenFaceRecognizer_create()
-
-#or use FisherFaceRecognizer by replacing above line with 
-#face_recognizer = cv2.face.FisherFaceRecognizer_create()
-
-# Treniramo face recognizer na našem trening skupu lica
 
 from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
@@ -139,8 +119,6 @@ print('Vrijeme treniranje_ face_recognizer: {}'.format(end_time - start_time))
 
 
 # Predviđanje
-
-
 
 # Funkcija za crtanje pravokutnika 
 def draw_rectangle(img, rect):
@@ -159,7 +137,7 @@ def predict(test_img):
 
     
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
-    print("kopiranje dimenzija", img.shape)
+    print("kopirana slika dimenzija", img.shape)
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
     #predict the image using our face recognizer 
@@ -173,7 +151,7 @@ def predict(test_img):
 
 
 
-#Pozivanje funkcije predvidanja na testnom skupu.
+#Pozivanje funkcije predvidanja na testnom skupu
 
 print("Predikcija slika u tijeku...")
 
@@ -188,8 +166,7 @@ for slika in dirs:
     print("nazivi slika", name)
 
     img_path= data_folder_path + "/" + name
-    # img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    # cv2.imshow("TESTNE SLIKE", img_path)
+
 
     # im = Image.open(img_path)  citanje pomocu pill
     # print(im.format, im.size, im.mode)
@@ -207,28 +184,5 @@ cv2.waitKey(1)
 cv2.destroyAllWindows()
      
 
-# #load test images
-# test_img1 = cv2.imread("test-data/test1.jpg") 
-# test_img2 = cv2.imread("test-data/test2.jpg")
-# # img = cv2.imread("test-data/test3.jpg", cv2.IMREAD_COLOR)
-
-# # izvrsi predvidanje
-# from datetime import datetime
-# start_time = datetime.now()  #sluzi da prikaz trajanja vremena
-# predicted_img1 = predict(test_img1)
-# predicted_img2 = predict(test_img2)
-# # img = predict(img)
-# end_time = datetime.now()
-# print('Predvidanje zavrseno{}'.format(end_time - start_time))
-
-# #pokazi slike predikcije
-# cv2.imshow(subjects[1], cv2.resize(predicted_img1, (400, 500)))
-# cv2.imshow(subjects[2], cv2.resize(predicted_img2, (400, 500)))
-# # cv2.imshow(subjects[3], cv2.resize(img (400, 500)))
-
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# cv2.waitKey(1)
-# cv2.destroyAllWindows()
 
 

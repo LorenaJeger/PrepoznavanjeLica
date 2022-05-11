@@ -166,6 +166,11 @@ print("Predikcija slika u tijeku...")
 #load test images
 test_img1 = cv2.imread("test-data/test1.jpg")
 test_img2 = cv2.imread("test-data/test2.jpg")
+test_img3 = cv2.imread("test-data/yann-martel-booker-prize-2002-G63G6M.jpeg")
+# test_img4 = cv2.imread("test-data/271351555_4752511271454628_3309608948412340253_n.jpeg")
+# test_img5 = cv2.imread("test-data/273161143_4856984027674018_7871627995080475922_n.jpeg")
+# test_img6 = cv2.imread("test-data/273238907_4867448079960946_8853499951396946421_n.jpeg")
+# test_img7 = cv2.imread("test-data/278121243_5044788105560275_4899458941832239904_n.jpg")
 
 
 # izvrsi predvidanje
@@ -173,6 +178,11 @@ from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 predicted_img1 = predict(test_img1)
 predicted_img2 = predict(test_img2)
+predicted_img3 = predict(test_img3)
+# predicted_img4 = predict(test_img4)
+# predicted_img5 = predict(test_img5)
+# predicted_img6 = predict(test_img6)
+# predicted_img7 = predict(test_img7)
 
 end_time = datetime.now()
 print('Predvidanje zavrseno{}'.format(end_time - start_time))
@@ -180,6 +190,11 @@ print('Predvidanje zavrseno{}'.format(end_time - start_time))
 #pokazi slike predikcije
 cv2.imshow(subjects[1], cv2.resize(predicted_img1, (width_d, height_d)))
 cv2.imshow(subjects[2], cv2.resize(predicted_img2, (width_d, height_d)))
+cv2.imshow(subjects[3], cv2.resize(predicted_img3, (width_d, height_d)))
+# cv2.imshow(subjects[4], cv2.resize(predicted_img4, (width_d, height_d)))
+# cv2.imshow(subjects[5], cv2.resize(predicted_img5, (width_d, height_d)))
+# cv2.imshow(subjects[6], cv2.resize(predicted_img6, (width_d, height_d)))
+# cv2.imshow(subjects[7], cv2.resize(predicted_img7, (width_d, height_d)))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
