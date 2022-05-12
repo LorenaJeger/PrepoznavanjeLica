@@ -6,7 +6,10 @@ from PIL import Image
 
 
 subjects=[]
-
+tocno_predvidio=0
+netocno_predvidio=0
+detektirao_lice=0
+ne_detektirano_lice=0
 #funkcija za detekciju lica pomocu OpenCV
 def detect_face(img):
     #Pretvoriti testne slike u sive slike jer open cv recognition tako očekuje
@@ -137,17 +140,21 @@ def predict(test_img):
 
     
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
-    print("kopirana slika dimenzija", img.shape)
+    # print("kopirana slika dimenzija", img.shape)
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
+    if face is None or rect is None : 
+        print("Nisam detektirao lice")
+        return None
     #predict the image using our face recognizer 
-    
-    label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
-    label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
-    
-    draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
-    draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
-    return img
+    else:
+        label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
+        label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
+        
+        draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
+        draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
+        print("Uspješno sam detektirao lice, predvidio sam ime: ", label_text)
+        return img
 
 
 
@@ -163,20 +170,26 @@ for slika in dirs:
                     continue 
     name= slika
     subjects.append(nazivi)
-    print("nazivi slika", name)
+    # print("naziv slike:", name)
 
     img_path= data_folder_path + "/" + name
-
-
-    # im = Image.open(img_path)  citanje pomocu pill
-    # print(im.format, im.size, im.mode)
-    
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    dimenzija=img.shape
-    print(dimenzija,name)
+    # dimenzija=img.shape
+    # print(dimenzija,name)
     
     predict_img=predict(img)
-    cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
+    if(predict_img is None):
+        ne_detektirano_lice= ne_detektirano_lice +1
+        print("Neuspješno detektiranje lica:", name)
+        cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
+    else: 
+        detektirao_lice=detektirao_lice+1
+        print("Uspješno detektirano lice na slici", name)
+        cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
+    cv2.waitKey(100)
+
+print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
+print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", len(dirs)-1)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
@@ -185,4 +198,5 @@ cv2.destroyAllWindows()
      
 
 
-
+ 
+                
