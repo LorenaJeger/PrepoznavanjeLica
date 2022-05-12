@@ -136,7 +136,7 @@ def draw_text(img, text, x, y):
 
 
 #Funkcija predikcije prepoznaje danu osobu na slici kao ulazni pamatar i crta pravokutnik oko otkrivenog lica s imenom
-def predict(test_img):
+def predict(test_img, predvideno_ime):
 
     
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
@@ -144,17 +144,16 @@ def predict(test_img):
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
     if face is None or rect is None : 
-        print("Nisam detektirao lice")
-        return None
+        # print("Nisam detektirao lice")
+        return None, None
     #predict the image using our face recognizer 
     else:
         label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
         label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
-        
+        predvideno_ime=label_text
         draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
         draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
-        print("Uspješno sam detektirao lice, predvidio sam ime: ", label_text)
-        return img
+        return img, predvideno_ime
 
 
 
@@ -176,15 +175,15 @@ for slika in dirs:
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
     # dimenzija=img.shape
     # print(dimenzija,name)
-    
-    predict_img=predict(img)
+    predvideno_ime=""
+    predict_img, predvideno_ime=predict(img, predvideno_ime)
     if(predict_img is None):
         ne_detektirano_lice= ne_detektirano_lice +1
-        print("Neuspješno detektiranje lica:", name)
+        print("Neuspješno detektiranje lica na slici:", name)
         cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
     else: 
         detektirao_lice=detektirao_lice+1
-        print("Uspješno detektirano lice na slici", name)
+        print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
     cv2.waitKey(100)
 
