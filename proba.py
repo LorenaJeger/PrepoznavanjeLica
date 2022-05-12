@@ -155,7 +155,12 @@ def predict(test_img, predvideno_ime):
         draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
         return img, predvideno_ime
 
+def usporedbaImena(name, predvideno_ime):
 
+    predvidenoIme_spojeno= "".join(predvideno_ime.split())
+    
+
+    return tocnost
 
 #Pozivanje funkcije predvidanja na testnom skupu
 
@@ -185,6 +190,7 @@ for slika in dirs:
         detektirao_lice=detektirao_lice+1
         print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
+        tocnost= usporedbaImena(name, predvideno_ime)
     cv2.waitKey(100)
 
 print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
