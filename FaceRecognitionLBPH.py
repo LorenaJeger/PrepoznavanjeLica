@@ -2,10 +2,14 @@
 import cv2
 import os
 import numpy as np
+from PIL import Image
 
 
 subjects=[]
-
+tocno_predvidio=0
+netocno_predvidio=0
+detektirao_lice=0
+ne_detektirano_lice=0
 #funkcija za detekciju lica pomocu OpenCV
 def detect_face(img):
     #Pretvoriti testne slike u sive slike jer open cv recognition tako očekuje
@@ -14,6 +18,8 @@ def detect_face(img):
     #učitavanje OpenCV face detector cv2.CascadeClassifier, korišten je  LBP koji je brži
     #Također ima i Haar classifier, ali je sporiji
     face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
+
+   
 
     # koristimo metodu `detectMultiScale` klase `cv2.CascadeClassifier` za otkrivanje svih lica na slici
     # faces sadržava popis svih lica koja su detektirana
@@ -45,17 +51,21 @@ def prepare_training_data(data_folder_path):
 
     faces = []  #lista u kojoj se spremaju sva lica
     labels = []   #lista u kojoj se spremaju sve labele
+    # nazivi=[]
+    # nazivi_novi=[]
    
     for dir_name in dirs:    #idi kroz svaki direktorij to jest svaku mapu i procitaj slike u njemu, za svaki dir_name(naziv mape u treningu) u dirs(trening mapa)
         
         # Probaj dobiti nazive imena foldera 
         if dir_name.startswith("."): continue
         if(i == 0): print("null indeks")
+        # else: i = i+ 1
         print("i:", i)
         name = dir_name
         subjects.append(name)
         i_string= str(i)
         label = int(dir_name.replace(name, i_string))
+        # nazivi_novi.append(label)
         subject_dir_path = data_folder_path + "/" + dir_name    #definiranje trenutnog direktorija za trenutni subjekt subject_dir_path    #primjer sample subject_dir_path = "training-data/s1"
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
@@ -76,11 +86,10 @@ def prepare_training_data(data_folder_path):
     cv2.destroyAllWindows()
     cv2.waitKey(1)
     cv2.destroyAllWindows()
+    # subjects= nazivi.sort(reverse=True)
     
     return faces, labels, subjects
  
-
-
 print("Pripremam ppodatke za treniranje...")
 
 from datetime import datetime
@@ -99,13 +108,9 @@ print("Duljina labels: ", len(labels))
 print("Duljina name: ", len(subjects))
 
 
-# Treniranje Face Recognizer u ovom primjeru ćemo koristiti LBPH face recognizer
-
-
 #Kreiramo LBPH face recognizer 
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-# Treniramo face recognizer na našem trening skupu lica
 
 from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
@@ -113,6 +118,8 @@ start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 face_recognizer.train(faces, np.array(labels))  # treniramo face_recognizer kojem prosljedujemo polje lica i numpy polje labele buduci da face recognition ocekuje da vektor oznaka bude niz
 end_time = datetime.now()
 print('Vrijeme treniranje_ face_recognizer: {}'.format(end_time - start_time))
+
+
 
 # Predviđanje
 
@@ -129,67 +136,88 @@ def draw_text(img, text, x, y):
 
 
 #Funkcija predikcije prepoznaje danu osobu na slici kao ulazni pamatar i crta pravokutnik oko otkrivenog lica s imenom
-def predict(test_img):
+def predict(test_img, predvideno_ime):
 
+    
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
-    print("kopirana slika dimenzija", img.shape)
+    # print("kopirana slika dimenzija", img.shape)
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
+    if face is None or rect is None : 
+        # print("Nisam detektirao lice")
+        return None, None
     #predict the image using our face recognizer 
-    
-    label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
-    label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
-    
-    draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
-    draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
-    return img
+    else:
+        label, confidence = face_recognizer.predict(face)  #Predviđamo sliku pomoću face_recognizer kojeg smo trenirali prosljedujemo mu sliku 
+        label_text = subjects[label]  #dobivamo naziv odgovarajuće oznake koju vraća face recognizer
+        predvideno_ime=label_text
+        draw_rectangle(img, rect) #crtamo pravokutnik oko detektirane slike 
+        draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
+        return img, predvideno_ime
 
+def usporedbaImena(name, predvideno_ime):
+    #name = naziv slike u testu, predvideno_ime= ime koje algoritam predvida naziv mape u trening data
+    tocnost=0
+    predvidenoIme_spojeno= "".join(predvideno_ime.split())  #Spoji ime sa prezimenom bez razmaka 
+    if name.endswith('.jpg'):
+        name_bez_nastavka = name.strip(".jpg")    #iz test slike makni nastavak
+        print("rezano",name_bez_nastavka)
+    if name.endswith('.jpeg'):
+        name_bez_nastavka = name.strip(".jpeg")
+        print("rezano", name_bez_nastavka)
 
-#Pozivanje funkcije predvidanja na testnom skupu.
+    if(predvidenoIme_spojeno.casefold() in name_bez_nastavka.casefold()):   #Da li je predvideno ime cafefold(case sensitive) sadržan u name_bez_nastavka
+        tocnost=1 
+        print("Nasao sam")
+        return tocnost
+    else : print("Nisam nasao")   
+    return tocnost
+   
+
+#Pozivanje funkcije predvidanja na testnom skupu
 
 print("Predikcija slika u tijeku...")
 
-#load test images
-test_img1 = cv2.imread("test-data/test1.jpg") 
-test_img2 = cv2.imread("test-data/test2.jpg")
-test_img3 = cv2.imread("test-data/test3.jpg")
-# test_img4 = cv2.imread("test-data/test4.jpeg")
-# test_img5 = cv2.imread("test-data/test5.jpeg")
-# test_img6 = cv2.imread("test-data/test6.jpeg")
-# test_img7 = cv2.imread("test-data/test7.jpeg")
-# test_img8 = cv2.imread("test-data/test8.jpeg")
-# test_img9 = cv2.imread("test-data/test9.jpg")
+data_folder_path='test-data'
+dirs = os.listdir(data_folder_path) 
+nazivi=[]
+for slika in dirs:
+    if slika.startswith("."):   #ignoriraj system files like .DS_Store
+                    continue 
+    name= slika
+    subjects.append(nazivi)
+    # print("naziv slike:", name)
 
+    img_path= data_folder_path + "/" + name
+    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    # dimenzija=img.shape
+    # print(dimenzija,name)
+    predvideno_ime=""
+    predict_img, predvideno_ime=predict(img, predvideno_ime)
+    if(predict_img is None):
+        ne_detektirano_lice= ne_detektirano_lice +1
+        print("Neuspješno detektiranje lica na slici:", name)
+        cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
+    else: 
+        detektirao_lice=detektirao_lice+1
+        print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
+        cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
+        tocnost= usporedbaImena(name, predvideno_ime)
+        print("Tocnost", tocnost)
+        if(tocnost == 1): tocno_predvidio=tocno_predvidio+1
+        else: netocno_predvidio=netocno_predvidio+1
+    cv2.waitKey(100)
 
-
-# izvrsi predvidanje
-from datetime import datetime
-start_time = datetime.now()  #sluzi da prikaz trajanja vremena
-predicted_img1 = predict(test_img1)
-predicted_img2 = predict(test_img2)
-predicted_img3 = predict(test_img3)
-# predicted_img4 = predict(test_img4)
-# predicted_img5 = predict(test_img5)
-# predicted_img6 = predict(test_img6)
-# predicted_img7 = predict(test_img7)
-# predicted_img8 = predict(test_img8)
-# predicted_img9 = predict(test_img9)
-
-end_time = datetime.now()
-print('Predvidanje zavrseno{}'.format(end_time - start_time))
-
-#pokazi slike predikcije
-cv2.imshow("Predvidanje na tesnom skupu", cv2.resize(predicted_img1, (400, 500)))
-cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img2, (400, 500)))
-cv2.imshow("Predvidanje na tesnom skupu_", cv2.resize(predicted_img3, (400, 500)))
-
-
+print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
+print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", len(dirs)-1)
+print("Broj točno istinitih lica", tocno_predvidio,"/", len(dirs)-1)
+print("Broj lažno istinitih lica", netocno_predvidio,"/", len(dirs)-1)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
 cv2.destroyAllWindows()
+     
 
 
-# Metrike koje jos moram dodati: 
-# Recognition Rate is the total number of correctly identified probe images, divided by the total number of probe images.
-# Recognition Accuracy = (Number of recognized face images/Total Number of Face Images tested)X100
+ 
+                
