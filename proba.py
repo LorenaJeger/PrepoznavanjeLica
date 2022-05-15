@@ -156,11 +156,23 @@ def predict(test_img, predvideno_ime):
         return img, predvideno_ime
 
 def usporedbaImena(name, predvideno_ime):
+    #name = naziv slike u testu, predvideno_ime= ime koje algoritam predvida naziv mape u trening data
+    tocnost=0
+    predvidenoIme_spojeno= "".join(predvideno_ime.split())  #Spoji ime sa prezimenom bez razmaka 
+    if name.endswith('.jpg'):
+        name_bez_nastavka = name.strip(".jpg")    #iz test slike makni nastavak
+        print("rezano",name_bez_nastavka)
+    if name.endswith('.jpeg'):
+        name_bez_nastavka = name.strip(".jpeg")
+        print("rezano", name_bez_nastavka)
 
-    predvidenoIme_spojeno= "".join(predvideno_ime.split())
-    
-
+    if(predvidenoIme_spojeno.casefold() in name_bez_nastavka.casefold()):   #Da li je predvideno ime cafefold(case sensitive) sadržan u name_bez_nastavka
+        tocnost=1 
+        print("Nasao sam")
+        return tocnost
+    else : print("Nisam nasao")   
     return tocnost
+   
 
 #Pozivanje funkcije predvidanja na testnom skupu
 
@@ -191,11 +203,15 @@ for slika in dirs:
         print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
         tocnost= usporedbaImena(name, predvideno_ime)
+        print("Tocnost", tocnost)
+        if(tocnost == 1): tocno_predvidio=tocno_predvidio+1
+        else: netocno_predvidio=netocno_predvidio+1
     cv2.waitKey(100)
 
 print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
 print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", len(dirs)-1)
-
+print("Broj točno istinitih lica", tocno_predvidio,"/", len(dirs)-1)
+print("Broj lažno istinitih lica", netocno_predvidio,"/", len(dirs)-1)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
