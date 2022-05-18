@@ -59,13 +59,11 @@ def prepare_training_data(data_folder_path):
         # Probaj dobiti nazive imena foldera 
         if dir_name.startswith("."): continue
         if(i == 0): print("null indeks")
-        # else: i = i+ 1
         print("i:", i)
         name = dir_name
         subjects.append(name)
         i_string= str(i)
         label = int(dir_name.replace(name, i_string))
-        # nazivi_novi.append(label)
         subject_dir_path = data_folder_path + "/" + dir_name    #definiranje trenutnog direktorija za trenutni subjekt subject_dir_path    #primjer sample subject_dir_path = "training-data/s1"
         subject_images_names = os.listdir(subject_dir_path)   #sprema naziv trenutne slike subjekta unutar subject direktorija
 
@@ -86,7 +84,6 @@ def prepare_training_data(data_folder_path):
     cv2.destroyAllWindows()
     cv2.waitKey(1)
     cv2.destroyAllWindows()
-    # subjects= nazivi.sort(reverse=True)
     
     return faces, labels, subjects
  
