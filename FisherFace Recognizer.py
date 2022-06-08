@@ -6,8 +6,8 @@ import numpy as np
 
 subjects=[]
 width_d, height_d = 400, 500
-tocno_predvidio=0
-netocno_predvidio=0
+true_positive=0
+true_negative=0
 detektirao_lice=0
 ne_detektirano_lice=0
 #funkcija za detekciju lica pomocu OpenCV
@@ -171,9 +171,11 @@ def usporedbaImena(name, predvideno_ime):
     return tocnost
    
 
+
 #Pozivanje funkcije predvidanja na testnom skupu
 
 print("Predikcija slika u tijeku...")
+start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 
 data_folder_path='test-data'
 dirs = os.listdir(data_folder_path) 
@@ -193,28 +195,31 @@ for slika in dirs:
     predict_img, predvideno_ime=predict(img, predvideno_ime)
     if(predict_img is None):
         ne_detektirano_lice= ne_detektirano_lice +1
-        # print("Neuspješno detektiranje lica na slici:", name)
-        cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (width_d, height_d)))
+        print("Neuspješno detektiranje lica na slici:", name)
+        cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
     else: 
         detektirao_lice=detektirao_lice+1
-        # print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
-        cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (width_d, height_d)))
+        print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
+        cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
         tocnost= usporedbaImena(name, predvideno_ime)
         # print("Tocnost", tocnost)
-        if(tocnost == 1): tocno_predvidio=tocno_predvidio+1
-        else: netocno_predvidio=netocno_predvidio+1
+        if(tocnost == 1): true_positive=true_positive+1
+        else: true_negative=true_negative+1
     cv2.waitKey(100)
+
+end_time = datetime.now()
+print('Vrijeme predikcije: {}'.format(end_time - start_time))
+
 
 print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
 print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", len(dirs)-1)
-print("Broj točno istinitih lica", tocno_predvidio,"/", len(dirs)-1)
-print("Broj lažno istinitih lica", netocno_predvidio,"/", len(dirs)-1)
+print("Broj točno istinitih lica", true_positive,"/", len(dirs)-1)
+print("Broj lažno istinitih lica", true_negative,"/", len(dirs)-1)
+accuracy= (true_positive+true_negative)/len(dirs)-1 
+accuracy_postotak=accuracy*(-100)
+print("accuracy: ", accuracy)
+print("accuracy_posotak: ", accuracy_postotak, " % ")
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
 cv2.destroyAllWindows()
-     
-
-
- 
-                
