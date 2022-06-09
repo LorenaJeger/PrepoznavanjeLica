@@ -210,13 +210,17 @@ for slika in dirs:
 end_time = datetime.now()
 print('Vrijeme predikcije: {}'.format(end_time - start_time))
 
+br_dirs=len(dirs)-1 
 
-print("Broj detektiranih lica na testu", detektirao_lice, "/", len(dirs)-1)
-print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", len(dirs)-1)
-print("Broj točno istinitih lica", true_positive,"/", len(dirs)-1)
-print("Broj lažno istinitih lica", true_negative,"/", len(dirs)-1)
-accuracy= (true_positive+true_negative)/len(dirs)-1 
-accuracy_postotak=accuracy*(-100)
+print("Broj detektiranih lica na testu", detektirao_lice, "/", br_dirs)
+print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", br_dirs)
+print("Broj točno istinitih lica", true_positive,"/", br_dirs)
+print("Broj lažno istinitih lica", true_negative,"/", br_dirs)
+
+
+print("Duzina dirs-a: ", br_dirs)
+accuracy= (true_positive+true_negative)/br_dirs
+accuracy_postotak=accuracy*100
 print("accuracy: ", accuracy)
 print("accuracy_posotak: ", accuracy_postotak, " % ")
 cv2.waitKey(0)
