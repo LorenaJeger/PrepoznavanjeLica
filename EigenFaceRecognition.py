@@ -1,3 +1,4 @@
+#Izvor: https://docs.opencv.org/3.4/da/d60/tutorial_face_main.html
 
 import cv2
 import os
@@ -109,6 +110,7 @@ print('Vrijeme pripreme_ podataka tj detekcija i spremanje: {}'.format(end_time 
 # Treniranje Face Recognizer u ovom primjeru ćemo koristiti EigenFaceRecognizer
 #Kreiramo EigenFace face recognizer 
 face_recognizer = cv2.face.EigenFaceRecognizer_create()
+# cv2.face.LBPHFaceRecognizer_create() 
 
 
 from datetime import datetime

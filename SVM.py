@@ -1,6 +1,10 @@
+# Izvor: https://github.com/ageitgey/face_recognition
+
 import face_recognition
+import sklearn 
 from sklearn import svm
 import os
+
 
 
 # Training the SVC classifier
@@ -125,3 +129,6 @@ accuracy= (true_positive+true_negative)/br_dirs
 accuracy_postotak=accuracy*100
 print("accuracy: ", accuracy)
 print("accuracy_posotak: ", accuracy_postotak, " % ")
+
+
+
