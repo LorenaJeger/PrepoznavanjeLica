@@ -20,8 +20,8 @@ def detect_face(img):
      
     #učitavanje OpenCV face detector cv2.CascadeClassifier, korišten je  LBP koji je brži
     #Također ima i Haar classifier, ali je sporiji
-    face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
-    #face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_alt.xml')
+    #face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
+    face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_alt.xml')
    
    
 

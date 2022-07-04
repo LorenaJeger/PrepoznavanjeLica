@@ -222,6 +222,7 @@ print("Broj lažno istinitih lica", true_negative,"/", br_dirs)
 print("Duzina dirs-a: ", br_dirs)
 accuracy= (true_positive+true_negative)/br_dirs
 accuracy_postotak=accuracy*100
+
 print("accuracy: ", accuracy)
 print("accuracy_posotak: ", accuracy_postotak, " % ")
 cv2.waitKey(0)
