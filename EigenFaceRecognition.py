@@ -17,9 +17,9 @@ def detect_face(img):
     #Pretvoriti testne slike u sive slike jer open cv recognition tako očekuje
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
      
-    #učitavanje OpenCV face detector cv2.CascadeClassifier, korišten je  LBP koji je brži
-    #Također ima i Haar classifier, ali je sporiji
-    face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
+    #učitavanje OpenCV face detector cv2.CascadeClassifier, korišten je Haar classifier koji je sporiji,  LBP koji je brži
+    #face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
+    face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_alt.xml')
 
    
 
