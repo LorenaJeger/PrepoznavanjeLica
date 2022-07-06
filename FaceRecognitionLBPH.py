@@ -6,6 +6,7 @@ import os
 import numpy as np
 from PIL import Image
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 
 
 subjects=[]
@@ -101,15 +102,8 @@ print("Podaci pripremljeni")
 end_time = datetime.now()
 print('Vrijeme pripreme_ podataka tj detekcija i spremanje: {}'.format(end_time - start_time))
 
-#Ispisujemo koliko je detektirano lica i koliko je detektirano labela prilikom prpiremanja podataka, funkcija pripremi podatke poziva funkciju detekcija lica 
-# print("Duljina faces: ", len(faces))
-# print("Duljina labels: ", len(labels))
-# print("Duljina name: ", len(subjects))
-
-
 #Kreiramo LBPH face recognizer 
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-
 
 
 from datetime import datetime
@@ -118,7 +112,6 @@ start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 face_recognizer.train(faces, np.array(labels))  # treniramo face_recognizer kojem prosljedujemo polje lica i numpy polje labele buduci da face recognition ocekuje da vektor oznaka bude niz
 end_time = datetime.now()
 print('Vrijeme treniranje_ face_recognizer: {}'.format(end_time - start_time))
-
 
 
 # Predviđanje
@@ -140,11 +133,10 @@ def predict(test_img, predvideno_ime):
 
     
     img = test_img.copy()  #Kopiramo sliku da sačuvamo original
-    # print("kopirana slika dimenzija", img.shape)
     face, rect = detect_face(img)     #Detektiramo lice na slici
     
     if face is None or rect is None : 
-        # print("Nisam detektirao lice")
+        #print("Nisam detektirao lice")
         return None, None
     #predict the image using our face recognizer 
     else:
@@ -162,14 +154,11 @@ def usporedbaImena(name, predvideno_ime):
     predvidenoIme_spojeno= "".join(predvideno_ime.split())  #Spoji ime sa prezimenom bez razmaka 
     if name.endswith('.jpg'):
         name_bez_nastavka = name.strip(".jpg")    #iz test slike makni nastavak
-        # print("rezano",name_bez_nastavka)
     if name.endswith('.jpeg'):
         name_bez_nastavka = name.strip(".jpeg")
-        # print("rezano", name_bez_nastavka)
 
     if(predvidenoIme_spojeno.casefold() in name_bez_nastavka.casefold()):   #Da li je predvideno ime cafefold(case sensitive) sadržan u name_bez_nastavka
         tocnost=1 
-        # print("Nasao sam")
         return tocnost
     else : print("Nisam nasao")   
     return tocnost
@@ -183,50 +172,43 @@ start_time = datetime.now()  #sluzi da prikaz trajanja vremena
 data_folder_path='test-data'
 dirs = os.listdir(data_folder_path) 
 nazivi=[]
+y_test= []
+y_pred= []
 for slika in dirs:
     if slika.startswith("."):   #ignoriraj system files like .DS_Store
                     continue 
     name= slika
     subjects.append(nazivi)
-    # print("naziv slike:", name)
 
     img_path= data_folder_path + "/" + name
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    # dimenzija=img.shape
-    # print(dimenzija,name)
     predvideno_ime=""
     predict_img, predvideno_ime=predict(img, predvideno_ime)
+
     if(predict_img is None):
         ne_detektirano_lice= ne_detektirano_lice +1
         print("Neuspješno detektiranje lica na slici:", name)
         cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
     else: 
         detektirao_lice=detektirao_lice+1
-        print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
+        #print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
         tocnost= usporedbaImena(name, predvideno_ime)
-        # print("Tocnost", tocnost)
+        y_test.append(''.join([i for i in name.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
+        y_pred.append(predvideno_ime.replace(" ", "").replace("_", "").casefold())
+
         if(tocnost == 1): true_positive=true_positive+1
         else: true_negative=true_negative+1
-    cv2.waitKey(100)
+    cv2.waitKey(100) 
 
 end_time = datetime.now()
 print('Vrijeme predikcije: {}'.format(end_time - start_time))
 
-
-br_dirs=len(dirs)-1 
-
-print("Broj detektiranih lica na testu", detektirao_lice, "/", br_dirs)
-print("Broj nedetektiranih lica na testu", ne_detektirano_lice,"/", br_dirs)
-print("Broj točno istinitih lica", true_positive,"/", br_dirs)
-print("Broj lažno istinitih lica", true_negative,"/", br_dirs)
+print("Classification_report")
+print(classification_report(y_test, y_pred)) 
+     
 
 
-print("Duzina dirs-a: ", br_dirs)
-accuracy= (true_positive+true_negative)/br_dirs
-accuracy_postotak=accuracy*100
-print("accuracy: ", accuracy)
-print("accuracy_posotak: ", accuracy_postotak, " % ")
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)

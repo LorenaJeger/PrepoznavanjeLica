@@ -4,7 +4,7 @@ import face_recognition
 import sklearn 
 from sklearn import svm
 import os
-
+from sklearn.metrics import classification_report
 
 
 # Training the SVC classifier
@@ -89,7 +89,8 @@ dirs = os.listdir(data_folder_path)
 
 from datetime import datetime
 start_time = datetime.now()  #sluzi da prikaz trajanja vremena
-
+y_test= []
+y_pred= []
 
 for slika in dirs:
     if slika.startswith("."):   
@@ -113,22 +114,20 @@ for slika in dirs:
           predvideno_ime = clf.predict([test_image_enc])
           print(*predvideno_ime)
           tocnost= usporedbaImena(naziv, *predvideno_ime)
+          print(predvideno_ime)
+          y_test.append(''.join([i for i in naziv.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
+          y_pred.append(predvideno_ime[0].lstrip("training-data/").replace(" ", "").replace("_", "").casefold())
+
         #   print(tocnost)
           if(tocnost == 1): true_positive = true_positive +1
           else: true_negative=true_negative+1
          
-print("Nasao sam tocno pozitivnih:", true_positive)
-print("Nasao sam tocno negativnih:", true_negative)
+
+print(classification_report(y_test, y_pred)) 
 
 end_time = datetime.now()
 print('Vrijeme predvidanja: {}'.format(end_time - start_time))
 
-br_dirs=len(dirs)-1 
-print("Duzina dirs-a: ", br_dirs)
-accuracy= (true_positive+true_negative)/br_dirs
-accuracy_postotak=accuracy*100
-print("accuracy: ", accuracy)
-print("accuracy_posotak: ", accuracy_postotak, " % ")
 
 
 
