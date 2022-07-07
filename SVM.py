@@ -12,8 +12,7 @@ from sklearn.metrics import classification_report
 # Trening podaci -> faces polje slika sa prepoznatim licima enkodiranima, names polje sadrzava imena tih lica
 faces = []
 names = []
-true_positive=0
-true_negative=0
+
 
 # Training direktorij
 dirs = os.listdir("/Users/lorena/Documents/PrepoznavanjeLicaKod/training-data")
@@ -117,10 +116,6 @@ for slika in dirs:
           print(predvideno_ime)
           y_test.append(''.join([i for i in naziv.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
           y_pred.append(predvideno_ime[0].lstrip("training-data/").replace(" ", "").replace("_", "").casefold())
-
-        #   print(tocnost)
-          if(tocnost == 1): true_positive = true_positive +1
-          else: true_negative=true_negative+1
          
 
 print(classification_report(y_test, y_pred)) 

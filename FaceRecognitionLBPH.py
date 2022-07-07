@@ -10,8 +10,6 @@ from sklearn.metrics import classification_report
 
 
 subjects=[]
-true_positive=0
-true_negative=0
 detektirao_lice=0
 ne_detektirano_lice=0
 #funkcija za detekciju lica pomocu OpenCV
@@ -187,18 +185,14 @@ for slika in dirs:
 
     if(predict_img is None):
         ne_detektirano_lice= ne_detektirano_lice +1
-        print("Neuspješno detektiranje lica na slici:", name)
-        cv2.imshow("Nisam uspio detektirati lice na slici", cv2.resize(img, (400, 500)))
+        
     else: 
         detektirao_lice=detektirao_lice+1
-        #print("Uspješno detektirano lice na slici:", name, "predviđena osoba: ", predvideno_ime)
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
         tocnost= usporedbaImena(name, predvideno_ime)
         y_test.append(''.join([i for i in name.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
         y_pred.append(predvideno_ime.replace(" ", "").replace("_", "").casefold())
 
-        if(tocnost == 1): true_positive=true_positive+1
-        else: true_negative=true_negative+1
     cv2.waitKey(100) 
 
 end_time = datetime.now()
@@ -206,15 +200,8 @@ print('Vrijeme predikcije: {}'.format(end_time - start_time))
 
 print("Classification_report")
 print(classification_report(y_test, y_pred)) 
-     
-
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.waitKey(1)
 cv2.destroyAllWindows()
-     
-
-
- 
-                
