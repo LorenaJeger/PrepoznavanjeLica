@@ -64,25 +64,6 @@ end_time = datetime.now()
 print('Vrijeme kreiranja i treniranje SCV klasifikatora: {}'.format(end_time - start_time))
 
 
-def usporedbaImena(naziv, predvideno_ime):
-    #naziv = naziv slike u testu, predvideno_ime= ime koje algoritam predvida naziv mape u trening data
-    #Predvideno ime training-data/Ramiz Raja
-    tocnost=0
-    predvideno_ime_strip= predvideno_ime.lstrip("training-data/")
-    predvidenoIme_spojeno= "".join(predvideno_ime_strip.split())  #Spoji ime sa prezimenom bez razmaka 
-    if naziv.endswith('.jpg'):
-        name_bez_nastavka = naziv.strip(".jpg")    #iz test slike makni nastavak
-    if naziv.endswith('.jpeg'):
-        name_bez_nastavka = naziv.strip(".jpeg")
-        
-    if(predvidenoIme_spojeno.casefold() in name_bez_nastavka.casefold()):   #Da li je predvideno ime cafefold(case sensitive) sadržan u name_bez_nastavka
-        tocnost=1 
-        print("Nasao sam")
-        return tocnost
-    else : print("Nisam nasao", predvidenoIme_spojeno, name_bez_nastavka)   
-    return tocnost
-
-
 data_folder_path='test-data'
 dirs = os.listdir(data_folder_path) 
 
@@ -112,7 +93,6 @@ for slika in dirs:
           test_image_enc = face_recognition.face_encodings(test_image)[i]
           predvideno_ime = clf.predict([test_image_enc])
           print(*predvideno_ime)
-          tocnost= usporedbaImena(naziv, *predvideno_ime)
           print(predvideno_ime)
           y_test.append(''.join([i for i in naziv.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
           y_pred.append(predvideno_ime[0].lstrip("training-data/").replace(" ", "").replace("_", "").casefold())

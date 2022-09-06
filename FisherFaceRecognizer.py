@@ -143,22 +143,6 @@ def predict(test_img, predvideno_ime):
         draw_text(img, label_text, rect[0], rect[1]-5)    #ispisujemo ime od predicted osobe
         return img, predvideno_ime
 
-def usporedbaImena(name, predvideno_ime):
-    #name = naziv slike u testu, predvideno_ime= ime koje algoritam predvida naziv mape u trening data
-    tocnost=0
-    predvidenoIme_spojeno= "".join(predvideno_ime.split())  #Spoji ime sa prezimenom bez razmaka 
-    if name.endswith('.jpg'):
-        name_bez_nastavka = name.strip(".jpg")    #iz test slike makni nastavak
-    if name.endswith('.jpeg'):
-        name_bez_nastavka = name.strip(".jpeg")
-
-    if(predvidenoIme_spojeno.casefold() in name_bez_nastavka.casefold()):   #Da li je predvideno ime cafefold(case sensitive) sadržan u name_bez_nastavka
-        tocnost=1 
-        # print("Nasao sam")
-        return tocnost
-    # else : print("Nisam nasao")   
-    return tocnost
-   
 
 #Pozivanje funkcije predvidanja na testnom skupu
 
@@ -187,7 +171,6 @@ for slika in dirs:
     else: 
         detektirao_lice=detektirao_lice+1
         cv2.imshow("Predvidam na testu", cv2.resize(predict_img, (400, 500)))
-        tocnost= usporedbaImena(name, predvideno_ime)
         y_test.append(''.join([i for i in name.replace(" ", "").split(".")[0].casefold().replace("_", "").replace("test", "") if not i.isdigit()]))
         y_pred.append(predvideno_ime.replace(" ", "").replace("_", "").casefold())
 
